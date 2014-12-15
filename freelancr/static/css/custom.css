@@ -1,0 +1,24 @@
+body {
+  padding-top: 50px;
+}
+.content-area {
+  padding: 40px 15px;
+}
+.customer-table td {
+  cursor: pointer;
+}
+
+.table-activity {
+  font-size: 0.8em;
+}
+
+.input-xs {
+  height: 22px;
+  padding: 5px 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+/* Bootstrap angular rule */ 
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
