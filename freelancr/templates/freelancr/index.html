@@ -36,21 +36,21 @@
           <input class="form-control imput" type="text" ng-model="query" placeholder="Search customers...">
           <table class="table table-hover customer-table">
             <tr ng-click="selectCustomer(customer)" ng-repeat="customer in customers | filter:query">
-              <td >{{ customer.name }}</td>
+              <td ng-bind="customer.name"></td>
             </tr>
           </table>
         </div>
         
         <!--Detail area-->
         <div class="col-md-10" ng-model="selectedCustomer">
-          <h2>{{ selectedCustomer.name }} <small>{{ selectedCustomer.totalHours }} hours</small></h2>
-          <div>{{ selectedCustomer.street }}</div>
-          <div>{{ selectedCustomer.phone }}</div>
+          <h2><span ng-bind="selectedCustomer.name"></span> <small> <span ng-bind="selectedCustomer.totalHours"></span> hours</small></h2>
+          <div ng-bind="selectedCustomer.street"></div>
+          <div ng-bind="selectedCustomer.phone"></div>
           <br>
           <button type="button" class="btn btn-default" ng-click="addProject()">Add project</button>
           <br>
           <div ng-repeat="project in selectedCustomerProjects">
-            <h4>{{ project.name }} <small>{{ project.totalHours }} hours</small><h4>
+            <h4><span ng-bind="project.name"></span> <small><span ng-bind="project.totalHours"></span> hours</small>   <button type="button" class="btn btn-default btn-sm" ng-click="removeProject(project)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button><h4>
               <table class="table table-condensed table-activity">
                 <thead>
                   <th class="col-sm-2">Date</th>
@@ -62,12 +62,12 @@
                   <th class="col-sm-2"></th>
                 </thead>
                 <tr ng-repeat="activity in project.activities">
-                  <td>{{ activity.date }}</td>
-                  <td>{{ activity.description }}</td>
-                  <td>{{ activity.rate }}</td>
-                  <td>{{ activity.duration }}</td>
-                  <td>{{ activity.billed | bool }}</td>
-                  <td>{{ activity.payed | bool}}</td>
+                  <td ng-bind="activity.date"></td>
+                  <td ng-bind="activity.description"></td>
+                  <td ng-bind="activity.rate"></td>
+                  <td ng-bind="activity.duration"></td>
+                  <td ng-bind="activity.billed | bool"></td>
+                  <td ng-bind="activity.payed | bool"></td>
                   <td>
                     <div class="btn-group btn-group-xs" aria-label="...">
                       <button type="button" class="btn btn-default btn-xs" ng-click="editActivityModal(activity)">Edit</button>
@@ -112,7 +112,20 @@
       </div>
       <div class="modal-footer">
       <button class="btn btn-primary" ng-click="addProject()">Done</button>
-      <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      </div>
+      </script>
+
+      <script type="text/ng-template" id="removeProjectModal.html">
+      <div class="modal-header">
+      <h3 class="modal-title">Remove Project</h3>
+      </div>
+      <div class="modal-body">
+      Are you sure you want to remove the project?
+      </div>
+      <div class="modal-footer">
+      <button class="btn btn-danger" ng-click="removeProject()">Done</button>
+      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
       </script>
 
@@ -170,7 +183,7 @@
       </div>
       <div class="modal-footer">
       <button class="btn btn-primary" ng-click="editActivity()">Done</button>
-      <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
       </script>
     </div>

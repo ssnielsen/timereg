@@ -89,6 +89,20 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
     });
   };
 
+  // Remove a project
+  $scope.removeProject = function(project) {
+    var removeProjectModalInstance = $modal.open({
+      templateUrl: 'removeProjectModal.html',
+      controller: 'RemoveProjectController'
+    });
+
+    removeProjectModalInstance.result.then(function () {
+      $http.delete('project/' + project.id + '/').success(function(data) {
+        $scope.loadProjects();
+      });
+    });
+  };
+
 });
 
 // Controller for adding an activity (each row in table is a controller)
@@ -148,6 +162,17 @@ freelancrApp.controller('EditController', function($scope, $modalInstance, activ
 freelancrApp.controller('AddProjectController', function($scope, $modalInstance) {
   $scope.addProject = function() {
     $modalInstance.close($scope.name);
+  };
+
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+});
+
+// Controller for removing a project
+freelancrApp.controller('RemoveProjectController', function($scope, $modalInstance) {
+  $scope.removeProject = function() {
+    $modalInstance.close();
   };
 
   $scope.cancel = function() {
