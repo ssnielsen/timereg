@@ -9,7 +9,6 @@ urlpatterns = [
   url(r'^customer/(?P<id>[0-9]+)/projects/$', views.CustomerProjects.as_view()),
   url(r'^project/$', views.ProjectList.as_view()),
   url(r'^project/(?P<id>[0-9]+)/$', views.ProjectDetails.as_view()),
-  url(r'^project/(?P<id>[0-9]+)/activities/$', views.ProjectActivities.as_view()),
   url(r'^activity/$', views.ActivityList.as_view()),
   url(r'^activity/(?P<id>[0-9]+)/$', views.ActivityDetails.as_view()),
   # url(r'^auth/register/$', views.register),

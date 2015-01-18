@@ -1,4 +1,38 @@
-var freelancrApp = angular.module('freelancrApp', ['ui.bootstrap', 'ngCookies']);
+/* SERVICES */
+var freelancerServices = angular.module('freelancerServices', ['ngResource']);
+
+freelancerServices.factory('Customer', ['$resource',
+  function($resource) {
+    return $resource('/customer/:id\\/', {}, {
+      'get':    {method:'GET'},
+      'save':   {method:'POST'},
+      'query':  {method:'GET', isArray: true},
+      'delete': {method:'DELETE'},
+      'update': {method:'PUT', params: {id: '@id'}}
+    });
+  }
+]);
+
+freelancerServices.factory('Project', ['$resource',
+  function($resource) {
+    return $resource('/project/:id\\/');
+  }
+]);
+
+freelancerServices.factory('Activity', ['$resource',
+  function($resource) {
+    return $resource('/activity/:id\\/',{}, {
+      'get':    {method:'GET'},
+      'save':   {method:'POST'},
+      'query':  {method:'GET', isArray:true},
+      'delete': {method:'DELETE'},
+      'update': {method:'PUT', params: {id: '@id'}}
+    });
+  }
+]);
+
+/* APP */
+var freelancrApp = angular.module('freelancrApp', ['ui.bootstrap', 'ngCookies', 'freelancerServices']);
 
 freelancrApp.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
@@ -6,47 +40,24 @@ freelancrApp.config(['$httpProvider', function($httpProvider) {
   }
 ]);
 
-
-freelancrApp.controller('AppController', function($scope, $http, $modal) {
+freelancrApp.controller('AppController', function($scope, $modal, Customer, Project, Activity) {
   $scope.selectedCustomer = null;
   $scope.selectedCustomerProjects = null;
 
-  // $scope.user = null;
-
-  // $scope.getCredentials = function(){
-  //     return {username: $scope.username, password: $scope.password};
-  // };
-
-  // $scope.login = function(){
-  //   var creds = $scope.getCredentials();
-  //   console.log(creds);
-
-  //   $http.post('auth/login/', creds).success(function(data) {
-  //     $scope.user = creds.username;
-  //   });
-  // };
-
-  // $scope.logout = function(){
-  //   $http.post('auth/logout/').success(function(data) {
-  //     $scope.user = null;
-  //   });
-  // };
-
-  // $scope.register = function(){
-  //   var creds = $scope.getCredentials();
-
-  //   $http.post('auth/register/', creds).success(function(data) {
-  //     $scope.user = creds.username;
-  //   });
-  // };
-
-  // Load all customers for customer list
+  // Load all customers for customer list and select the first
   $scope.loadCustomers = function() {
-    $http.get('customer').success(function(data) {
-      $scope.customers = data;
+    Customer.query(function (customers) {
+      $scope.customers = customers;
       $scope.selectCustomer($scope.customers[0]);
     });
   };
+
+  $scope.reloadCustomers = function() {
+    Customer.query(function (customers) {
+      $scope.customers = customers;
+    });
+  };
+
   $scope.loadCustomers();
 
   // Function called in ng-click tag on customer in customer list
@@ -57,8 +68,8 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
 
   // Load projects for a single customer
   $scope.loadProjects = function() {
-    $http.get('customer/' + $scope.selectedCustomer.id + '/projects/').success(function(data) {
-      $scope.selectedCustomerProjects = data;
+    Customer.get($scope.selectedCustomer, function(customer) {
+      $scope.selectedCustomerProjects = customer.projects;
       var sum = function(prev, cur) { return prev+cur.duration; };
       for (var i = 0; i < $scope.selectedCustomerProjects.length; i++) {
         var total = $scope.selectedCustomerProjects[i].activities.reduce(sum, 0);
@@ -78,16 +89,9 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
     return activity.showButtons = !activity.showButtons;
   };
 
-  // Load acitivities for a single project
-  $scope.projectActivities = function(project) {
-    $http.get('project/' + project.id + '/activities/').success(function(data) {
-      return data;
-    });
-  };
-
   // Delete an activity
   $scope.deleteActivity = function(activity) {
-    $http.delete('activity/' + activity.id + '/').success(function(data) {
+    Activity.delete(activity, function() {
       $scope.loadProjects();
     });
   };
@@ -102,7 +106,7 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
 
     // Callback when submitting edit activity modal
     editActivityModalInstance.result.then(function (activity) {
-      $http.put('activity/' + activity.id + '/', activity).success(function (data) {
+      Activity.update(activity, function () {
         $scope.loadProjects();
       });
     });
@@ -126,7 +130,7 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
         name: name
       };
 
-      $http.post('project/', newProject).success(function(data) {
+      Project.save(newProject, function() {
         $scope.loadProjects();
       });
     });
@@ -140,7 +144,7 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
     });
 
     removeProjectModalInstance.result.then(function () {
-      $http.delete('project/' + project.id + '/').success(function(data) {
+      Project.delete(project, function() {
         $scope.loadProjects();
       });
     });
@@ -154,9 +158,9 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
     });
 
     addCustomerModalInstance.result.then(function (customer) {
-      console.log(customer);
-      $http.post('customer/', customer).success(function(data) {
-        $scope.loadCustomers();
+      Customer.save(customer, function(result) {
+        $scope.reloadCustomers();
+        $scope.selectCustomer(result);
       });
     });
   };
@@ -171,7 +175,7 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
 
     // Callback when submitting edit customer modal
     editCustomerModalInstance.result.then(function (customer) {
-      $http.put('customer/' + customer.id + '/', customer).success(function (data) {
+      Customer.update(customer, function() {
         $scope.selectCustomer(customer);
       });
     });
@@ -185,7 +189,7 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
     });
 
     removeCustomerModalInstance.result.then(function () {
-      $http.delete('customer/' + customer.id + '/').success(function(data) {
+      Customer.delete(customer, function() {
         $scope.loadCustomers();
       });
     });
@@ -194,7 +198,7 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
 });
 
 // Controller for adding an activity (each row in table is a controller)
-freelancrApp.controller('AddController', function($scope, $http) {
+freelancrApp.controller('AddController', function($scope, Activity) {
   $scope.format = "yyyy-MM-dd";
   $scope.duration = 0;
   $scope.rate = 0;
@@ -219,7 +223,7 @@ freelancrApp.controller('AddController', function($scope, $http) {
     };
 
     // Post to service
-    $http.post('activity/', newActivity).success(function(data) {
+    Activity.save(newActivity, function() {
       $scope.$emit('reloadProjects', {}); // Update activities
     });
   };
@@ -328,3 +332,37 @@ freelancrApp.filter('bool', function() {
     return value ? "Yes" : "No";
   };
 });
+
+angular.module('ngResource').config([
+    '$provide', '$httpProvider',
+    function($provide, $httpProvider) {
+        $provide.decorator('$resource', function($delegate) {
+            return function() {
+                if (arguments.length > 0) {  // URL
+                    arguments[0] = arguments[0].replace(/\/$/, '\\/');
+                }
+
+                if (arguments.length > 2) {  // Actions
+                    angular.forEach(arguments[2], function(action) {
+                        if (action && action.url) {
+                            action.url = action.url.replace(/\/$/, '\\/');
+                        }
+                    });
+                }
+
+                return $delegate.apply($delegate, arguments);
+            };
+        });
+
+        $provide.factory('resourceEnforceSlashInterceptor', function() {
+            return {
+                request: function(config) {
+                    config.url = config.url.replace(/[\/\\]+$/, '/');
+                    return config;
+                }
+            };
+        });
+
+        $httpProvider.interceptors.push('resourceEnforceSlashInterceptor');
+    }
+]);

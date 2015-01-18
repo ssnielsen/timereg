@@ -1,11 +1,6 @@
 from rest_framework import serializers
 from freelancr.models import Activity, Customer, Project
 
-class CustomerSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = Customer
-    fields = ('id', 'name', 'street', 'phone')
-
 class ActivitySerializer(serializers.ModelSerializer):
   date = serializers.DateField(format='iso-8601')
   class Meta:
@@ -18,3 +13,11 @@ class ProjectSerializer(serializers.ModelSerializer):
   class Meta:
     model = Project
     fields = ('id', 'customer', 'name', 'activities')
+
+class CustomerSerializer(serializers.ModelSerializer):
+  projects = ProjectSerializer(many=True, required=False)
+
+  class Meta:
+    model = Customer
+    fields = ('id', 'name', 'street', 'phone', 'projects')
+

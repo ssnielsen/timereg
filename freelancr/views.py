@@ -43,13 +43,6 @@ class ActivityDetails(generics.RetrieveUpdateDestroyAPIView):
   serializer_class = ActivitySerializer
   lookup_field = 'id'
 
-class ProjectActivities(generics.ListAPIView):
-  serializer_class = ActivitySerializer
-
-  def get_queryset(self):
-    activities = Activity.objects.filter(project=self.kwargs['id'])
-    return activities
-
 # def register(request):
 #   if not request.method == 'POST':
 #     return HttpResponse(status = 405)
