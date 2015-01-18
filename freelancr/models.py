@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Customer(models.Model):
@@ -13,6 +14,7 @@ class Customer(models.Model):
 class Project(models.Model):
   customer = models.ForeignKey(Customer, related_name='projects')
   name = models.CharField(max_length=255)
+  owner = models.ForeignKey(User, default=-1)
 
   def __unicode__(self):
     return '{0} - {1}'.format(self.customer.name, self.name)

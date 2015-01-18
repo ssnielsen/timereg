@@ -12,6 +12,9 @@ urlpatterns = [
   url(r'^project/(?P<id>[0-9]+)/activities/$', views.ProjectActivities.as_view()),
   url(r'^activity/$', views.ActivityList.as_view()),
   url(r'^activity/(?P<id>[0-9]+)/$', views.ActivityDetails.as_view()),
+  # url(r'^auth/register/$', views.register),
+  # url(r'^auth/login/$', views.login_user),
+  # url(r'^auth/logout/$', views.logout_user),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -6,15 +6,48 @@ freelancrApp.config(['$httpProvider', function($httpProvider) {
   }
 ]);
 
+
 freelancrApp.controller('AppController', function($scope, $http, $modal) {
   $scope.selectedCustomer = null;
   $scope.selectedCustomerProjects = null;
 
+  // $scope.user = null;
+
+  // $scope.getCredentials = function(){
+  //     return {username: $scope.username, password: $scope.password};
+  // };
+
+  // $scope.login = function(){
+  //   var creds = $scope.getCredentials();
+  //   console.log(creds);
+
+  //   $http.post('auth/login/', creds).success(function(data) {
+  //     $scope.user = creds.username;
+  //   });
+  // };
+
+  // $scope.logout = function(){
+  //   $http.post('auth/logout/').success(function(data) {
+  //     $scope.user = null;
+  //   });
+  // };
+
+  // $scope.register = function(){
+  //   var creds = $scope.getCredentials();
+
+  //   $http.post('auth/register/', creds).success(function(data) {
+  //     $scope.user = creds.username;
+  //   });
+  // };
+
   // Load all customers for customer list
-  $http.get('customer').success(function(data) {
-    $scope.customers = data;
-    $scope.selectCustomer($scope.customers[0]);
-  });
+  $scope.loadCustomers = function() {
+    $http.get('customer').success(function(data) {
+      $scope.customers = data;
+      $scope.selectCustomer($scope.customers[0]);
+    });
+  };
+  $scope.loadCustomers();
 
   // Function called in ng-click tag on customer in customer list
   $scope.selectCustomer = function(customer) {
@@ -33,6 +66,16 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
       }
       $scope.selectedCustomer.totalHours = $scope.selectedCustomerProjects.reduce(function(prev, cur) { return prev+cur.totalHours; }, 0);
     });
+
+    $('.hover-visible').css('visiblity','hidden');
+    $('.activity').hover(function() {
+      $(this).find('.hover-visible').css('visiblity','visible');
+    });
+  };
+
+  $scope.hover = function(activity) {
+    // Shows/hides the delete button on hover
+    return activity.showButtons = !activity.showButtons;
   };
 
   // Load acitivities for a single project
@@ -103,11 +146,65 @@ freelancrApp.controller('AppController', function($scope, $http, $modal) {
     });
   };
 
+  // Add a customer
+  $scope.addCustomerModal = function() {
+    var addCustomerModalInstance = $modal.open({
+      templateUrl: 'addCustomerModal.html',
+      controller: 'AddCustomerController'
+    });
+
+    addCustomerModalInstance.result.then(function (customer) {
+      console.log(customer);
+      $http.post('customer/', customer).success(function(data) {
+        $scope.loadCustomers();
+      });
+    });
+  };
+
+  // Edit a customer
+  $scope.editCustomer = function(customer) {
+    var editCustomerModalInstance = $modal.open({
+      templateUrl: 'editCustomerModal.html',
+      controller: 'EditCustomerController',
+      resolve: { customer: function() { return customer; } }
+    });
+
+    // Callback when submitting edit customer modal
+    editCustomerModalInstance.result.then(function (customer) {
+      $http.put('customer/' + customer.id + '/', customer).success(function (data) {
+        $scope.selectCustomer(customer);
+      });
+    });
+  };
+
+  // Remove a customer
+  $scope.removeCustomer = function(customer) {
+    var removeCustomerModalInstance = $modal.open({
+      templateUrl: 'removeCustomerModal.html',
+      controller: 'RemoveCustomerController'
+    });
+
+    removeCustomerModalInstance.result.then(function () {
+      $http.delete('customer/' + customer.id + '/').success(function(data) {
+        $scope.loadCustomers();
+      });
+    });
+  };
+
 });
 
 // Controller for adding an activity (each row in table is a controller)
 freelancrApp.controller('AddController', function($scope, $http) {
   $scope.format = "yyyy-MM-dd";
+  $scope.duration = 0;
+  $scope.rate = 0;
+
+  $scope.handleNaN = function(number) {
+    if (angular.isNumber(number))
+      return number;
+    else
+      return 0;
+  };
 
   // Adds activity - used in form
   $scope.addActivity = function(project) {
@@ -172,6 +269,51 @@ freelancrApp.controller('AddProjectController', function($scope, $modalInstance)
 // Controller for removing a project
 freelancrApp.controller('RemoveProjectController', function($scope, $modalInstance) {
   $scope.removeProject = function() {
+    $modalInstance.close();
+  };
+
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+});
+
+// Controller for adding a customer
+freelancrApp.controller('AddCustomerController', function($scope, $modalInstance) {
+  $scope.addCustomer = function() {
+    var customer = {
+      name: $scope.name,
+      street: $scope.street,
+      phone: $scope.phone
+    };
+    $modalInstance.close(customer);
+  };
+
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+});
+
+// Controller for edit activity modal
+freelancrApp.controller('EditCustomerController', function($scope, $modalInstance, customer) {
+  $scope.name = customer.name;
+  $scope.street = customer.street;
+  $scope.phone = customer.phone;
+
+  $scope.editCustomer = function() {
+    customer.name = $scope.name;
+    customer.street = $scope.street;
+    customer.phone = $scope.phone;
+    $modalInstance.close(customer);
+  };
+
+  $scope.cancel = function() {
+    $modalInstance.dismiss('cancel');
+  };
+});
+
+// Controller for removing a customer
+freelancrApp.controller('RemoveCustomerController', function($scope, $modalInstance) {
+  $scope.removeCustomer = function() {
     $modalInstance.close();
   };
 

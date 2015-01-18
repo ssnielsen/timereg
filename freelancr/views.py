@@ -1,9 +1,7 @@
-from django.http import Http404
 from django.shortcuts import render_to_response
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import mixins
+from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from rest_framework import generics
 from freelancr.models import Customer, Project, Activity
 from freelancr.serializers import CustomerSerializer, ProjectSerializer, ActivitySerializer
@@ -51,3 +49,42 @@ class ProjectActivities(generics.ListAPIView):
   def get_queryset(self):
     activities = Activity.objects.filter(project=self.kwargs['id'])
     return activities
+
+# def register(request):
+#   if not request.method == 'POST':
+#     return HttpResponse(status = 405)
+
+#   username = request.POST['username']
+#   password = request.POST['password']
+#   user = User.objects.create(username, 'admin@' + username + '.com', password)
+#   user.save()
+
+#   authed = authenticate(username = username, password = password)
+#   login(request, authed)
+
+#   return HttpResponse()
+
+# def login_user(request):
+#   print(request.POST)
+
+#   if not request.method == 'POST':
+#     return HttpResponse(status = 405)
+
+#   username = request.POST['username']
+#   password = request.POST['password']
+
+#   authed = authenticate(username = username, password = password)
+#   login(request, authed)
+
+#   return HttpResponse()
+
+# def logout_user(request):
+#   if not request.method == 'POST':
+#     return HttpResponse(status = 405)
+
+#   logout(request)
+
+#   return HttpResponse()
+
+
+
