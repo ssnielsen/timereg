@@ -70,59 +70,77 @@
         <div class="col-md-9" ng-model="selectedCustomer">
           <div class="row">
             <div class="col-md-6">
-              <h2><span ng-bind="selectedCustomer.name"></span> <small> <span ng-bind="selectedCustomer.totalHours"></span> hours</small></h2>
-              <div ng-bind="selectedCustomer.street"></div>
+              <h2 style="margin-top: 0"><span ng-bind="selectedCustomer.name"></span></h2>
+              <div style="font-style: strong" ng-bind="selectedCustomer.street"></div>
               <div ng-bind="selectedCustomer.phone"></div>
             </div>
             <div class="col-md-6">
               <button type="button" class="btn btn-default" ng-click="addProject()">Add project</button>
               <button type="button" class="btn btn-default" ng-click="editCustomer(selectedCustomer)">Edit customer</button>
-              <button type="button" class="btn btn-default" ng-click="removeCustomer(selectedCustomer)">Remove customer</button>
+              <button type="button" class="btn btn-default" ng-click="removeCustomer(selectedCustomer)">Remove customer</button><br>
+              <h2>
+                <small>
+                  <div><span ng-bind="selectedCustomer.totalHours"></span> <span ng-bind="selectedCustomer.totalHours | hourOrHours"></span> total</div>
+                  <div><span ng-bind="selectedCustomer.totalBilledHours"></span> <span ng-bind="selectedCustomer.totalBilledHours | hourOrHours"></span> billed</div>
+                  <div><span ng-bind="selectedCustomer.totalPayedHours"></span> <span ng-bind="selectedCustomer.totalPayedHours | hourOrHours"></span> payed</div>
+                </small>
+              </h2>
             </div>
           </div>
-          <br><br>
-          <div ng-repeat="project in selectedCustomerProjects">
-            <h4><span ng-bind="project.name"></span> <small><span ng-bind="project.totalHours"></span> hours</small>&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-default btn-sm" ng-click="removeProject(project)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button><h4>
-                  <form name="addActivityForm">
-              <table class="table table-activity">
-                <thead>
-                  <th class="col-sm-2">Date</th>
-                  <th class="col-sm-4">Description</th>
-                  <th style="width:auto">Rate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                  <th style="width:auto">Duration</th>
-                  <th style="width:auto">Amount</th>
-                  <th style="width:auto">Billed</th>
-                  <th style="width:auto">Payed</th>
-                  <th class="col-sm-2"></th>
-                </thead>
-                <tr ng-repeat="activity in project.activities" ng-mouseenter="hover(activity)" ng-mouseleave="hover(activity)">
-                  <td ng-bind="activity.date"></td>
-                  <td ng-bind="activity.description"></td>
-                  <td class="number" ng-bind="activity.rate"></td>
-                  <td class="number" ng-bind="activity.duration"></td>
-                  <td class="number" ng-bind="activity.rate * activity.duration"></td>
-                  <td class="number"><span class="glyphicon glyphicon-ok" aria-hidden="true" ng-show="activity.billed"></span></td>
-                  <td class="number"><span class="glyphicon glyphicon-ok" aria-hidden="true" ng-show="activity.payed"></span></td>
-                  <td class="cell-no-padding">
-                    <div class="btn-group btn-group-sm" aria-label="..." ng-show="activity.showButtons">
-                      <button type="button" class="btn btn-default btn-sm" ng-click="editActivityModal(activity)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
-                      <button type="button" class="btn btn-default btn-sm" ng-click="deleteActivity(activity)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                    </div>
-                  </td>
-                </tr>
-                <tr ng-controller="AddController">
-                    <td>
-                      <input type="text" class="form-control input input-xs" datepicker-popup="{{format}}" ng-click="openDatePicker($event)" ng-model="date" is-open="opened" close-text="Close" required="">
-                    </td>
-                    <td><input class="form-control input input-xs" type="text" ng-model="description" required=""></td>
-                    <td><input class="form-control input input-xs" type="text" ng-model="rate" required=""></td>
-                    <td><input class="form-control input input-xs" type="text" ng-model="duration" required=""></td>
-                    <td class="number" ng-bind="handleNaN(rate * duration)">0</td>
-                    <td class="number"><input type="checkbox" ng-model="billed"></td>
-                    <td class="number"><input type="checkbox" ng-model="payed"></td>
-                    <td><button type="submit" class="btn btn-default btn-sm" ng-click="addActivity(project)" ng-disabled="addActivityForm.$invalid"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></td>
-                </tr>
-              </table>
+          <div class="row" ng-repeat="project in selectedCustomerProjects">
+            <h4><span ng-bind="project.name"></span> 
+              <small>
+                <span ng-bind="project.totalHours"></span>&nbsp;<span ng-bind="project.totalHours | hourOrHours"></span>&nbsp;total&nbsp;-
+                <span ng-bind="project.billedHours"></span>&nbsp;<span ng-bind="project.billedHours | hourOrHours"></span>&nbsp;billed&nbsp;-
+                <span ng-bind="project.payedHours"></span>&nbsp;<span ng-bind="project.payedHours | hourOrHours"></span>&nbsp;payed&nbsp;&nbsp;
+              </small>
+                <button type="button" class="btn btn-default btn-sm" ng-click="removeProject(project)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                <h4>
+                  <form name="addActivityForm" novalidate>
+                    <table class="table table-activity">
+                      <thead>
+                        <th class="col-sm-2">Date</th>
+                        <th class="col-sm-4">Description</th>
+                        <th style="width:auto">Rate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        <th style="width:auto">Duration</th>
+                        <th style="width:auto">Amount</th>
+                        <th style="width:auto">Billed</th>
+                        <th style="width:auto">Payed</th>
+                        <th class="col-sm-2"></th>
+                      </thead>
+                      <tr ng-repeat="activity in project.activities" ng-mouseenter="hover(activity)" ng-mouseleave="hover(activity)">
+                        <td ng-bind="activity.date"></td>
+                        <td ng-bind="activity.description"></td>
+                        <td class="number" ng-bind="activity.rate"></td>
+                        <td class="number" ng-bind="activity.duration"></td>
+                        <td class="number" ng-bind="activity.rate * activity.duration"></td>
+                        <td class="number"><span class="glyphicon glyphicon-ok" aria-hidden="true" ng-show="activity.billed"></span></td>
+                        <td class="number"><span class="glyphicon glyphicon-ok" aria-hidden="true" ng-show="activity.payed"></span></td>
+                        <td class="cell-no-padding">
+                          <div class="btn-group btn-group-sm" aria-label="..." ng-show="activity.showButtons">
+                            <button type="button" class="btn btn-default btn-sm" ng-click="editActivityModal(activity)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
+                            <button type="button" class="btn btn-default btn-sm" ng-click="deleteActivity(activity)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr ng-controller="AddController">
+                          <td>
+                            <input type="text" class="form-control input input-xs" datepicker-popup="{{format}}" ng-click="openDatePicker($event)" ng-show="showAddActivity" ng-model="date" is-open="opened" close-text="Close" required="">
+                          </td>
+                          <td><input class="form-control input input-xs" type="text" ng-show="showAddActivity" ng-model="description" required=""></td>
+                          <td><input class="form-control input input-xs" type="text" ng-show="showAddActivity" ng-model="rate" required=""></td>
+                          <td><input class="form-control input input-xs" type="text" ng-show="showAddActivity" ng-model="duration" required=""></td>
+                          <td class="number"><span ng-show="showAddActivity" ng-bind="handleNaN(rate * duration)">0</span></td>
+                          <td class="number"><input type="checkbox" ng-show="showAddActivity" ng-model="billed"></td>
+                          <td class="number"><input type="checkbox" ng-show="showAddActivity" ng-model="payed"></td>
+                          <td>
+                            <button type="submit" class="btn btn-default btn-sm" ng-show="showAddActivity" ng-click="addActivity(project)" ng-disabled="addActivityForm.$invalid"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                            <button class="btn btn-default btn-xs" ng-show="showAddActivity" ng-click="showAdd()">Cancel</button>
+                            <button class="btn btn-default btn-sm" ng-hide="showAddActivity" ng-click="showAdd()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                          </td>
+                          <!--button type="submit" class="btn btn-default btn-sm" ng-hide="showAddActivity" ng-click="showAdd()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button-->
+                      </tr>
+                    </table>
                   </form>
             </div>
           </div>  

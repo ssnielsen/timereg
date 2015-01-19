@@ -6,10 +6,6 @@ from rest_framework.test import APITestCase
 class CustomerTest(APITestCase):
   def test_customer(self):
     """
-    Adding a customer
-    """
-
-    """
     No customers initially
     """
     response = self.client.get('/customer/', format='json')

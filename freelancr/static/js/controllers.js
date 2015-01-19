@@ -71,11 +71,19 @@ freelancrApp.controller('AppController', function($scope, $modal, Customer, Proj
     Customer.get($scope.selectedCustomer, function(customer) {
       $scope.selectedCustomerProjects = customer.projects;
       var sum = function(prev, cur) { return prev+cur.duration; };
+      var billedFilter = function(e) { return e.billed; };
+      var payedFilter = function(e) { return billedFilter(e) && e.payed; };
       for (var i = 0; i < $scope.selectedCustomerProjects.length; i++) {
         var total = $scope.selectedCustomerProjects[i].activities.reduce(sum, 0);
+        var billed = $scope.selectedCustomerProjects[i].activities.filter(billedFilter).reduce(sum, 0);
+        var payed = $scope.selectedCustomerProjects[i].activities.filter(payedFilter).reduce(sum, 0);
         $scope.selectedCustomerProjects[i].totalHours = total;
+        $scope.selectedCustomerProjects[i].billedHours = billed;
+        $scope.selectedCustomerProjects[i].payedHours = payed;
       }
       $scope.selectedCustomer.totalHours = $scope.selectedCustomerProjects.reduce(function(prev, cur) { return prev+cur.totalHours; }, 0);
+      $scope.selectedCustomer.totalBilledHours = $scope.selectedCustomerProjects.reduce(function(prev, cur) { return prev+cur.billedHours; }, 0);
+      $scope.selectedCustomer.totalPayedHours = $scope.selectedCustomerProjects.reduce(function(prev, cur) { return prev+cur.payedHours; }, 0);
     });
 
     $('.hover-visible').css('visiblity','hidden');
@@ -202,12 +210,17 @@ freelancrApp.controller('AddController', function($scope, Activity) {
   $scope.format = "yyyy-MM-dd";
   $scope.duration = null;
   $scope.rate = null;
+  $scope.showAddActivity = false;
 
   $scope.handleNaN = function(number) {
     if (angular.isNumber(number))
       return number;
     else
       return 0;
+  };
+
+  $scope.showAdd = function() {
+    $scope.showAddActivity = !$scope.showAddActivity;
   };
 
   // Adds activity - used in form
@@ -330,6 +343,13 @@ freelancrApp.controller('RemoveCustomerController', function($scope, $modalInsta
 freelancrApp.filter('bool', function() {
   return function(value) {
     return value ? "Yes" : "No";
+  };
+});
+
+// Filter handling boolean values
+freelancrApp.filter('hourOrHours', function() {
+  return function(value) {
+    return value == 1 ? "hour" : "hours";
   };
 });
 
