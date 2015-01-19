@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 class CustomerTest(APITestCase):
-  def test_addCustomer(self):
+  def test_customer(self):
     """
     Adding a customer
     """
@@ -78,6 +78,17 @@ class CustomerTest(APITestCase):
     self.assertEqual(response.data[1]['phone'], secondCustomer['phone'])
 
     """
+    Editing a customer
+    """
+    editCustomer = dict(responseCustomer)
+    editCustomer['name'] = 'Apple Inc.'
+    response = self.client.put('/customer/' + str(responseCustomer['id']) + '/', editCustomer, format='json')
+    self.assertEqual(response.data['name'], editCustomer['name'])
+    self.assertEqual(response.data['street'], customer['street'])
+    self.assertEqual(response.data['phone'], customer['phone'])
+    self.assertEqual(response.data['id'], 1)
+
+    """
     Removing the first customer
     """
     response = self.client.delete('/customer/' + str(responseCustomer['id']) + '/', format='json')
@@ -101,6 +112,5 @@ class CustomerTest(APITestCase):
     self.assertEqual(response.data[0]['name'], secondCustomer['name'])
     self.assertEqual(response.data[0]['street'], secondCustomer['street'])
     self.assertEqual(response.data[0]['phone'], secondCustomer['phone'])
-
-
-
+    
+    # class ProjectTest(APITestCase):

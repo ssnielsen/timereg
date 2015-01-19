@@ -200,8 +200,8 @@ freelancrApp.controller('AppController', function($scope, $modal, Customer, Proj
 // Controller for adding an activity (each row in table is a controller)
 freelancrApp.controller('AddController', function($scope, Activity) {
   $scope.format = "yyyy-MM-dd";
-  $scope.duration = 0;
-  $scope.rate = 0;
+  $scope.duration = null;
+  $scope.rate = null;
 
   $scope.handleNaN = function(number) {
     if (angular.isNumber(number))

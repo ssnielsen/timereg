@@ -83,11 +83,12 @@
           <br><br>
           <div ng-repeat="project in selectedCustomerProjects">
             <h4><span ng-bind="project.name"></span> <small><span ng-bind="project.totalHours"></span> hours</small>&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-default btn-sm" ng-click="removeProject(project)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button><h4>
+                  <form name="addActivityForm">
               <table class="table table-activity">
                 <thead>
                   <th class="col-sm-2">Date</th>
                   <th class="col-sm-4">Description</th>
-                  <th style="width:auto">Rate</th>
+                  <th style="width:auto">Rate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
                   <th style="width:auto">Duration</th>
                   <th style="width:auto">Amount</th>
                   <th style="width:auto">Billed</th>
@@ -102,8 +103,6 @@
                   <td class="number" ng-bind="activity.rate * activity.duration"></td>
                   <td class="number"><span class="glyphicon glyphicon-ok" aria-hidden="true" ng-show="activity.billed"></span></td>
                   <td class="number"><span class="glyphicon glyphicon-ok" aria-hidden="true" ng-show="activity.payed"></span></td>
-                  <!--td class="number" ng-bind="activity.billed | bool"></td>
-                  <td class="number" ng-bind="activity.payed | bool"></td-->
                   <td class="cell-no-padding">
                     <div class="btn-group btn-group-sm" aria-label="..." ng-show="activity.showButtons">
                       <button type="button" class="btn btn-default btn-sm" ng-click="editActivityModal(activity)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
@@ -112,42 +111,43 @@
                   </td>
                 </tr>
                 <tr ng-controller="AddController">
-                  <td>
-                    <input type="text" class="form-control input input-xs" datepicker-popup="{{format}}" ng-click="openDatePicker($event)" ng-model="date" is-open="opened" close-text="Close"/>
-                  </td>
-                  <td><input class="form-control input input-xs" type="text" ng-model="description"></td>
-                  <td><input class="form-control input input-xs" type="text" ng-model="rate"></td>
-                  <td><input class="form-control input input-xs" type="text" ng-model="duration"></td>
-                  <td class="number" ng-bind="handleNaN(rate * duration)">0</td>
-                  <td class="number"><input type="checkbox" ng-model="billed"></td>
-                  <td class="number"><input type="checkbox" ng-model="payed"></td>
-                  <td><button type="submit" class="btn btn-default btn-sm" ng-click="addActivity(project)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></td>
+                    <td>
+                      <input type="text" class="form-control input input-xs" datepicker-popup="{{format}}" ng-click="openDatePicker($event)" ng-model="date" is-open="opened" close-text="Close" required="">
+                    </td>
+                    <td><input class="form-control input input-xs" type="text" ng-model="description" required=""></td>
+                    <td><input class="form-control input input-xs" type="text" ng-model="rate" required=""></td>
+                    <td><input class="form-control input input-xs" type="text" ng-model="duration" required=""></td>
+                    <td class="number" ng-bind="handleNaN(rate * duration)">0</td>
+                    <td class="number"><input type="checkbox" ng-model="billed"></td>
+                    <td class="number"><input type="checkbox" ng-model="payed"></td>
+                    <td><button type="submit" class="btn btn-default btn-sm" ng-click="addActivity(project)" ng-disabled="addActivityForm.$invalid"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button></td>
                 </tr>
               </table>
+                  </form>
             </div>
           </div>  
         </div>
       </div>
 
       <script type="text/ng-template" id="addProjectModal.html">
-      <div class="modal-header">
-        <h3 class="modal-title">Add Project</h3>
-      </div>
-      <form class="form-horizontal">
-        <div class="modal-body">
-          <fieldset>
-            <div class="form-group">
-              <label class="col-md-4 control-label" for="name">Project Name</label>  
-              <div class="col-md-4">
-                <input id="name" name="name" type="text" class="form-control input-md" ng-model="name" required="">
+      <form class="form-horizontal" name="addProjectForm" novalidate>
+        <div class="modal-header">
+          <h3 class="modal-title">Add Project</h3>
+        </div>
+          <div class="modal-body">
+            <fieldset>
+              <div class="form-group">
+                <label class="col-md-4 control-label" for="name">Project Name</label>  
+                <div class="col-md-4">
+                  <input id="name" name="name" type="text" class="form-control input-md" ng-model="name" required>
+                </div>
               </div>
-            </div>
-          </fieldset>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="addProject()">Add</button>
-          <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        </div>
+            </fieldset>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="addProject()" ng-disabled="addProjectForm.$invalid">Add</button>
+            <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+          </div>
       </form>
       </script>
 
@@ -167,10 +167,10 @@
       </script>
 
       <script type="text/ng-template" id="addCustomerModal.html">
+      <form class="form-horizontal" name="addCustomerForm" novalidate>
       <div class="modal-header">
         <h3 class="modal-title">Add Customer</h3>
       </div>
-      <form class="form-horizontal">
         <div class="modal-body">
           <fieldset>     
             <div class="form-group">
@@ -194,7 +194,7 @@
           </fieldset>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" ng-click="addCustomer()">Add</button>
+          <button class="btn btn-primary" ng-click="addCustomer()" ng-disabled="addCustomerForm.$invalid">Add</button>
           <button class="btn btn-default" ng-click="cancel()">Cancel</button>
         </div>
       </form>
@@ -204,8 +204,8 @@
       <div class="modal-header">
       <h3 class="modal-title">Edit Customer</h3>
       </div>
+      <form class="form-horizontal" name="editCustomerForm" novalidate>
       <div class="modal-body">
-      <form class="form-horizontal">
       <fieldset>
 
       <div class="form-group">
@@ -230,12 +230,12 @@
       </div>
 
       </fieldset>
-      </form>
       </div>
       <div class="modal-footer">
-      <button class="btn btn-primary" ng-click="editCustomer()">Edit</button>
+      <button class="btn btn-primary" ng-click="editCustomer()" ng-disabled="editCustomerForm.$invalid">Edit</button>
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
+      </form>
       </script>
 
       <script type="text/ng-template" id="removeCustomerModal.html">
@@ -252,11 +252,11 @@
       </script>
 
       <script type="text/ng-template" id="editActivityModal.html">
+      <form class="form-horizontal" name="editActivityForm" novalidate>
       <div class="modal-header">
       <h3 class="modal-title">Edit Activity</h3>
       </div>
       <div class="modal-body">
-      <form class="form-horizontal">
       <fieldset>
       <div class="form-group">
       <label class="col-md-4 control-label" for="date">Date</label>  
@@ -289,24 +289,24 @@
       <div class="form-group">
       <label class="col-md-4 control-label" for="billed">Billed</label>  
       <div class="col-md-4">
-      <input id="billed" name="billed" type="checkbox" class="form-control input-md" ng-model="billed" required="">
+      <input id="billed" name="billed" type="checkbox" class="form-control input-md" ng-model="billed">
       </div>
       </div>
 
       <div class="form-group">
       <label class="col-md-4 control-label" for="payed">Payed</label>  
       <div class="col-md-4">
-      <input id="payed" name="payed" type="checkbox" class="form-control input-md" ng-model="payed" required="">
+      <input id="payed" name="payed" type="checkbox" class="form-control input-md" ng-model="payed">
       </div>
       </div>
 
       </fieldset>
-      </form>
       </div>
       <div class="modal-footer">
-      <button class="btn btn-primary" ng-click="editActivity()">Edit</button>
+      <button class="btn btn-primary" ng-click="editActivity()" ng-disabled="editActivityForm.$invalid">Edit</button>
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
+      </form>
       </script>
     </div>
     {% endverbatim %}
